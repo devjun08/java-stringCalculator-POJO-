@@ -1,4 +1,7 @@
-package calculator;
+package exception;
 
-public class Calculator {
+public class InvalidException extends RuntimeException {
+    public InvalidException(String message) {
+        super(message);
+    }
 }
