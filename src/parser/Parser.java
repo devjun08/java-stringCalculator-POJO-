@@ -2,6 +2,7 @@ package parser;
 
 public class Parser {
 
+    
     // 입력 문자열을 숫자배열과 연산자로 분리하는 메서드
     public ParseResult parse(String input) {
         // 입력 값이 null이거나 공백만 있는 경우 예외 처리
