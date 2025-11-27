@@ -1,22 +1,39 @@
 package validator;
 
+import static exception.ErrorMessage.*;
+
 public class Validator {
-    // 숫자 배열 검증: 음수나 0 미만 숫자 허용하지 않음 예시
-    public void validateNumbers(int[] numbers) {
-        if (numbers == null || numbers.length == 0) {
-            throw new IllegalArgumentException("숫자 배열이 비어있습니다.");
-        }
-        for (int num : numbers) {
-            if (num <= 0) {
-                throw new IllegalArgumentException("0 이하의 숫자는 허용되지 않습니다: " + num);
-            }
+    public static void validateAll(String input) {
+        validateNull(input);
+        validateSeparator(input);
+        validateOperator(input);
+        divideByZero(input);
+    }
+
+    public static void validateSeparator(String input) {
+        final int OPERATOR_INDEX = input.length() - 1;
+        for (int i = 0; i < OPERATOR_INDEX; i++) {
+            char current = input.charAt(i);
+            char next = input.charAt(i + 1);
         }
     }
 
-    // 연산자 검증: + - * / 만 허용
-    public void validateOperator(String operator) {
-        if (operator == null || !operator.matches("[+\\-*/]")) {
-            throw new IllegalArgumentException("허용되지 않은 연산자입니다: " + operator);
+    public static void validateOperator(String input) {
+        if (input == null) {
+            throw new IllegalArgumentException(INPUT_NULL.getMessage());
         }
+
+    }
+    public static void divideByZero(String input) {
+        if (input == null) {
+            throw new IllegalArgumentException(INPUT_NULL.getMessage());
+        }
+
+    }
+    public static void validateNull(String input) {
+        if (input == null) {
+            throw new IllegalArgumentException(INPUT_NULL.getMessage());
+        }
+
     }
 }

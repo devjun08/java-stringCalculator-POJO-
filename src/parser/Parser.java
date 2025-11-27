@@ -1,68 +1,69 @@
 package parser;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+import exception.ErrorMessage;
+
 public class Parser {
 
-    
-    // 입력 문자열을 숫자배열과 연산자로 분리하는 메서드
-    public ParseResult parse(String input) {
-        // 입력 값이 null이거나 공백만 있는 경우 예외 처리
-        if (input == null || input.trim().isEmpty()) {
-            throw new IllegalArgumentException("입력이 비어 있습니다.");
-        }
+    private static final String NUMBER_PATTERN = "^[0-9]*\\.?[0-9]*$";
 
-        // 입력의 앞뒤 공백 제거
-        input = input.trim();
+    // 멤버 변수 (파싱된 결과 저장)
+    private List<Integer> numbers;
+    private String operatorSymbol;
 
-        // 공백 기준으로 나누어 토큰화 (마지막이 연산자임을 가정)
-        String[] tokens = input.split(" ");
-
-        // 최소 2개 이상 토큰이 있어야 함 (숫자 + 연산자)
-        if (tokens.length < 2) {
-            throw new IllegalArgumentException("연산자가 포함되어야 합니다.");
-        }
-
-        // 마지막 토큰이 연산자인지 검사 (+, -, *, / 중 하나여야 함)
-        String operator = tokens[tokens.length - 1];
-        if (!operator.matches("[+\\-*/]")) {
-            throw new IllegalArgumentException("잘못된 연산자입니다: " + operator);
-        }
-
-        // 숫자 부분만 다시 문자열로 합침 (중간에 공백 있을 경우 대비)
-        String numbersRaw = String.join("", java.util.Arrays.copyOf(tokens, tokens.length - 1));
-
-        // 숫자들을 콤마(,)나 콜론(:) 기준으로 분리
-        String[] numberStrings = numbersRaw.split("[,:]");
-
-        // 분리된 문자열 배열을 int 배열로 변환함
-        int[] numbers = new int[numberStrings.length];
-        try {
-            for (int i = 0; i < numberStrings.length; i++) {
-                numbers[i] = Integer.parseInt(numberStrings[i].trim());
-            }
-        } catch (NumberFormatException e) {
-            // 숫자가 아닌 값이 포함되면 예외 발생
-            throw new IllegalArgumentException("숫자 변환 오류: " + e.getMessage());
-        }
-
-        // 숫자 배열과 연산자를 포함하는 ParseResult 객체 생성 및 반환
-        return new ParseResult(numbers, operator);
+    // depth: 1
+    public void StringParser() {
+        this.numbers = new ArrayList<>();
+        this.operatorSymbol = "";
     }
 
     /**
-     * 숫자 배열과 연산자를 담는 내부 정적 클래스
+     * 입력 문자열을 파싱하여 숫자 리스트와 연산자 심볼을 멤버 변수에 저장합니다.
+     * (단일 메서드로 파싱을 완료)
+     * @param input 검증된 입력 문자열
      */
-    public static class ParseResult {
-        public final int[] numbers;    // 입력된 숫자 배열
-        public final String operator;  // 입력된 연산자
+    // depth: 1
+    public void parse(String input) {
+        String trimmedInput = input.trim();
+        String[] parts = trimmedInput.split(" ");
 
-        /**
-         * 생성자: 각 필드를 초기화
-         * @param numbers 숫자 배열
-         * @param operator 연산자 문자열
-         */
-        public ParseResult(int[] numbers, String operator) {
-            this.numbers = numbers;
-            this.operator = operator;
+        // parts[0] = 숫자 덩어리, parts[1] = 연산자 심볼 (Validator에서 이미 검증됨)
+        this.operatorSymbol = parts[1];
+
+        parseNumbersInternal(parts[0]);
+    }
+
+    // depth: 1: 숫자 부분 파싱 및 멤버 변수 numbers에 저장
+    private void parseNumbersInternal(String numbersPart) {
+        // 쉼표(,) 또는 콜론(:)을 구분자로 분리
+        String[] numberTokens = numbersPart.split("[:,]");
+
+        for (String token : numberTokens) { // depth: 1
+            if (token.isEmpty()) { // depth: 2
+                continue;
+            }
+            validateAndAddNumber(token);
         }
+    }
+
+    // depth: 1: 하나의 토큰을 정규식으로 검증하고 멤버 변수 numbers에 추가
+    private void validateAndAddNumber(String token) {
+        // 정규표현식 검증을 통과했으므로 안전하게 변환
+        int number = Integer.parseInt(token); // depth: 2
+        this.numbers.add(number);
+    }
+
+    // --- Getter 메서드 (Application에서 파싱 결과를 가져가도록 제공) ---
+
+    // depth: 1
+    public List<Integer> getNumbers() {
+        return this.numbers;
+    }
+
+    // depth: 1
+    public String getOperatorSymbol() {
+        return this.operatorSymbol;
     }
 }
